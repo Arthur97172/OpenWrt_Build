@@ -123,7 +123,8 @@ jobs:
       - name: feeds
         run: |
           cd ~/openwrt 
-          sed -i '1 i src-git ing https://github.com/Arthur97172/openwrt-packages;${{ env.CONFIG_REPO }}' feeds.conf.default
+          sed -i '1 i src-git ing https://github.com/wjz304/openwrt-packages;${{ env.CONFIG_REPO }}' feeds.conf.default
+
 
           ./scripts/feeds update -a
 

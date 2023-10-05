@@ -124,10 +124,14 @@ jobs:
         run: |
           cd ~/openwrt 
           sed -i '1 i src-git ing https://github.com/wjz304/openwrt-packages;${{ env.CONFIG_REPO }}' feeds.conf.default
+          # 添加passwall依赖及smartdns
+          git clone --depth=1 -b main https://github.com/xiaorouji/openwrt-passwall-packages package/passwall_packages
           git clone --depth=1 -b lede https://github.com/pymumu/luci-app-smartdns package/luci-app-smartdns
           git clone --depth=1 https://github.com/pymumu/openwrt-smartdns package/smartdns
 
           ./scripts/feeds update -a
+
+          ./scripts/feeds install -a
 
           ./scripts/feeds install -a
 

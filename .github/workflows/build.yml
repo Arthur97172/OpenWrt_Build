@@ -124,7 +124,8 @@ jobs:
         run: |
           cd ~/openwrt 
           sed -i '1 i src-git ing https://github.com/wjz304/openwrt-packages;${{ env.CONFIG_REPO }}' feeds.conf.default
-
+          git clone --depth=1 -b lede https://github.com/pymumu/luci-app-smartdns package/luci-app-smartdns
+          git clone --depth=1 https://github.com/pymumu/openwrt-smartdns package/smartdns
 
           ./scripts/feeds update -a
 

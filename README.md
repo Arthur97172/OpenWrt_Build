@@ -22,7 +22,7 @@
 ## Preview 请点击箭头→ 查看详情
 
 <details>
-<summary><b>&nbsp;x86_simple版软路由插件预览</b></summary>
+<summary><b>&nbsp;x86_mini版软路由插件预览</b></summary>
 <br/>
 <details>
 <summary><b>├── 状态</b></summary>

@@ -13,7 +13,7 @@
 #====================================================================
 
 repo=${1:-openwrt}
-owner=${2:-Arthur}
+owner=${2:-Ing}
 
 echo "OpenWrt DIY script"
 
@@ -29,7 +29,7 @@ sed -i 's/192.168.1.1/192.168.5.1/g' package/base-files/files/bin/config_generat
 #sed -i "s/'UTC'/'CST-8'\n        set system.@system[-1].zonename='Asia\/Shanghai'/g" package/base-files/files/bin/config_generate
 
 # Modify banner
-if [ "${owner}" == "Arthur" ]; then
+if [ "${owner}" == "Ing" ]; then
   if [ "${repo}" == "openwrt" ]; then
     cat >package/base-files/files/etc/banner <<EOF
   _______                     ________        __

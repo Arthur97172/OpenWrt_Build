@@ -2,18 +2,18 @@
 #!/bin/bash
 # © 2022 GitHub, Inc.
 #====================================================================
-# Copyright (c) 2022 Ing
+# Copyright (c) 2023 Arthur
 #
 # This is free software, licensed under the MIT License.
 # See /LICENSE for more information.
 #
-# https://github.com/wjz304/OpenWrt_Build
+# https://github.com/Arthur97172/OpenWrt_Build
 # File name: diy.sh
 # Description: OpenWrt DIY script
 #====================================================================
 
 repo=${1:-openwrt}
-owner=${2:-Ing}
+owner=${2:-Arthur}
 
 echo "OpenWrt DIY script"
 
@@ -29,7 +29,7 @@ sed -i 's/192.168.1.1/192.168.5.1/g' package/base-files/files/bin/config_generat
 #sed -i "s/'UTC'/'CST-8'\n        set system.@system[-1].zonename='Asia\/Shanghai'/g" package/base-files/files/bin/config_generate
 
 # Modify banner
-if [ "${owner}" == "Ing" ]; then
+if [ "${owner}" == "Arthur" ]; then
   if [ "${repo}" == "openwrt" ]; then
     cat >package/base-files/files/etc/banner <<EOF
   _______                     ________        __

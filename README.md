@@ -156,8 +156,6 @@
 　├── PassWall<br/>
 　├── PassWall2<br/>
 　├── Hello World<br/>
-　├── 广告屏蔽大师 Plus+<br/>
-　├── ShadowSocksR Plus+<br/>
 　├── AdGuard Home<br/>
 　├── 应用过滤<br/>
 　├── DDNSTO远程控制<br/>

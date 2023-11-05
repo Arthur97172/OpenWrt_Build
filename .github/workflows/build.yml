@@ -165,7 +165,7 @@ jobs:
           if [ -n "${status}" ]; then
             git add "${status}"
             git commit -m "update $(date +%Y-%m-%d" "%H:%M:%S)"
-            git push -f
+            #git push -f
           fi
 
       - name: Compile the firmware

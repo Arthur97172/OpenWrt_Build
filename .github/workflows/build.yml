@@ -125,6 +125,8 @@ jobs:
           cd ~/openwrt 
           sed -i '1 i src-git ing https://github.com/wjz304/openwrt-packages;${{ env.CONFIG_REPO }}' feeds.conf.default
           # 添加passwall,smartdns以及ddnsto
+          git clone --depth=1 -b v5 https://github.com/sbwml/luci-app-mosdns package/mosdns
+          git clone --depth=1 https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
           git clone --depth=1 -b main https://github.com/xiaorouji/openwrt-passwall-packages package/passwall_packages
           git clone --depth=1 -b lede https://github.com/pymumu/luci-app-smartdns package/luci-app-smartdns
           git clone --depth=1 https://github.com/pymumu/openwrt-smartdns package/smartdns

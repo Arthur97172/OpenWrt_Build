@@ -86,7 +86,7 @@
 　└── <b>退出</b>
 </details>
 
-![avatar](https://github.com/Arthur97172/OpenWrt_Build/blob/myapp/01.jpg)
+![avatar](https://github.com/Arthur97172/OpenWrt_Build/blob/myapp/001.jpg)
 
 ## 特别提示
 

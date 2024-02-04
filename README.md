@@ -59,7 +59,6 @@
 　├── MosDNS<br/>
 　├── OpenClash<br/>
 　├── 动态 DNS<br/>
-　├── SmartDNS<br/>
 　├── UPnP<br/>
 　└── MWAN3分流助手
 </details>

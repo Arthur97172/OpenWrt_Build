@@ -9,7 +9,7 @@ name: Build OpenWrt
 
 on:
   schedule:
-    - cron: "0 02 10 * *"
+    - cron: "0 0 1/2 * *"
   workflow_dispatch:
 
 jobs:
@@ -48,32 +48,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@main
 
-      - name: get config
-        run: |
-          # config 命名规则: <repo>;<owner>;<name>.config
-
-          config="${{ matrix.config }}"
-          config=${config/.config/}            # 去掉 .config 后缀
-          array=(${config//;/ })               # ;号分割
-
-          if [ ${#array[@]} -ne 3 ]; then
-            echo "${{ matrix.config }} name error!"
-            exit 1
-          fi
-
-          echo "CONFIG_REPO=${array[0]}" >> $GITHUB_ENV
-          echo "CONFIG_OWNER=${array[1]}" >> $GITHUB_ENV
-          echo "CONFIG_NAME=${array[2]}" >> $GITHUB_ENV
-
-          if [ "${array[0]}" == "openwrt" ]; then
-            echo "REPO_URL=https://github.com/openwrt/openwrt" >> $GITHUB_ENV
-            echo "REPO_BRANCH=master" >> $GITHUB_ENV
-          fi
-
-          if [ "${array[0]}" == "lede" ]; then
-            echo "REPO_URL=https://github.com/coolsnowwolf/lede" >> $GITHUB_ENV
-            echo "REPO_BRANCH=master" >> $GITHUB_ENV
-          fi
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          swap-storage: false
 
       - name: Init Env
         env:
@@ -81,13 +59,9 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
+          sudo timedatectl set-timezone "Asia/Shanghai"
 
-          docker rmi `docker images -q`
-          sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
-          sudo -E apt-mark hold grub-efi-amd64-signed
-          sudo -E apt update
-          sudo -E apt -y purge azure-cli* docker* ghc* zulu* llvm* firefox google* dotnet* powershell* openjdk* mysql* php* mongodb* dotnet* snap*
-          sudo -E apt -y full-upgrade
+          sudo apt update
           sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
           bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib \
           git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev \
@@ -95,116 +69,126 @@ jobs:
           mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools \
           libpython3-dev qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip \
           vim wget xmlto xxd zlib1g-dev python3-setuptools npm
-          sudo -E systemctl daemon-reload
-          sudo -E apt -y autoremove --purge
-          sudo -E apt clean
-          sudo -E timedatectl set-timezone "Asia/Shanghai"
+          sudo apt install --reinstall libc6
+          sudo systemctl daemon-reload
+          sudo apt -y autoremove --purge
+          sudo apt clean
 
-          git clone https://github.com/openwrt-dev/po2lmo
+          git clone --depth=1 https://github.com/openwrt-dev/po2lmo
           pushd po2lmo
             make && sudo make install
           popd
 
-      - name: Clone source code
+          df -h
+
+      - name: make
         run: |
-          df -hT $PWD
-          cd ~
+          WORKSPACE=${GITHUB_WORKSPACE:-$(pwd)}
+          release="${{ env.release }}"
+          script="${{ env.diyscript }}"
+          config="${{ matrix.config }}"               # config 命名规则: <repo>;<owner>;<name>.config
+          CONFIG=${config/.config/}                   # 去掉 .config 后缀
+          CONFIG_ARRAY=(${CONFIG//;/ })               # ;号分割
 
-          git clone ${{ env.REPO_URL }} -b ${{ env.REPO_BRANCH }} openwrt
-
-          if [ -d "openwrt/package/lean/r8125" ]; then
-            rm -rf openwrt/package/lean/r8125
+          if [ ${#CONFIG_ARRAY[@]} -ne 3 ]; then
+            echo "${config} name error!"
+            exit 1
           fi
 
-          # 容错
-          #sed -i '/TARGET_LDFLAGS += -lubox -lubus/i\TARGET_CFLAGS += -ffunction-sections -fdata-sections -flto' openwrt/package/network/services/hostapd/Makefile
-          #sed -i '/TARGET_LDFLAGS += -lubox -lubus/i\TARGET_LDFLAGS += -Wl,--gc-sections -flto=jobserver -fuse-linker-plugin' openwrt/package/network/services/hostapd/Makefile
+          CONFIG_REPO="${CONFIG_ARRAY[0]}"
+          CONFIG_OWNER="${CONFIG_ARRAY[1]}"
+          CONFIG_NAME="${CONFIG_ARRAY[2]}"
 
-      - name: feeds
-        run: |
-          cd ~/openwrt 
-          sed -i '1 i src-git ing https://github.com/wjz304/openwrt-packages;${{ env.CONFIG_REPO }}' feeds.conf.default
-          # 添加passwall,smartdns以及ddnsto
-          git clone --depth=1 -b v5 https://github.com/sbwml/luci-app-mosdns package/mosdns
-          git clone --depth=1 https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
-          git clone --depth=1 -b main https://github.com/xiaorouji/openwrt-passwall-packages package/passwall_packages
-          git clone --depth=1 -b lede https://github.com/pymumu/luci-app-smartdns package/luci-app-smartdns
-          git clone --depth=1 https://github.com/pymumu/openwrt-smartdns package/smartdns
-          git clone --depth=1 https://github.com/sbwml/openwrt_helloworld package/helloworld
-          git clone --depth=1 https://github.com/kenzok78/luci-theme-argone package/luci-theme-argone
-          git clone --depth=1 https://github.com/thinktip/luci-theme-neobird package/luci-theme-neobird
-          git clone --depth=1 -b master https://github.com/linkease/nas-packages package/ddnsto 
-          git clone --depth=1 -b main https://github.com/linkease/nas-packages-luci package/luci-app-ddnsto
-          
+          if [ "${CONFIG_REPO}" == "openwrt" ]; then
+            REPO_URL="https://github.com/openwrt/openwrt"
+            REPO_BRANCH="master"
+          fi
+
+          if [ "${CONFIG_REPO}" == "lede" ]; then
+            REPO_URL="https://github.com/coolsnowwolf/lede"
+            REPO_BRANCH="master"
+          fi
+
+          if [ ! -d ${CONFIG_REPO} ]; then
+            git clone --depth=1 -b ${REPO_BRANCH} ${REPO_URL} ${CONFIG_REPO}
+            if [ -d "${CONFIG_REPO}/package/lean/r8125" ]; then
+              rm -rf ${CONFIG_REPO}/package/lean/r8125
+            fi
+          fi
+
+          # root.
+          export FORCE_UNSAFE_CONFIGURE=1
+
+          pushd ${CONFIG_REPO}
+          git pull
+
+          # feeds
+          sed -i "/src-git ing /d; 1 i src-git ing https://github.com/wjz304/openwrt-packages;${CONFIG_REPO}" feeds.conf.default
 
           ./scripts/feeds update -a
-
+          if [ -d ./feeds/packages/lang/golang ]; then
+            rm -rf ./feeds/packages/lang/golang
+            git clone --depth=1 -b 22.x https://github.com/sbwml/packages_lang_golang ./feeds/packages/lang/golang
+          fi
           ./scripts/feeds install -a
-
-          ./scripts/feeds install -a
-
           ./scripts/feeds uninstall `grep Package ./feeds/ing.index | awk -F': ' '{print $2}'`
           ./scripts/feeds install -p ing -a
 
-      - name: Make config
-        run: |
-          # $GITHUB_WORKSPACE == ${{ github.workspace }}
-          cd ~/openwrt
+          cp -f "${WORKSPACE}/${config}" "./.config"
+          cp -f "${WORKSPACE}/${script}" "./diy.sh"
 
-          [ -e "$GITHUB_WORKSPACE/${{ matrix.config }}" ] && cp "$GITHUB_WORKSPACE/${{ matrix.config }}" "./.config"
-
-          if [ -e "$GITHUB_WORKSPACE/${{ env.diyscript }}" ]; then
-            chmod +x "$GITHUB_WORKSPACE/${{ env.diyscript }}"
-            "$GITHUB_WORKSPACE/${{ env.diyscript }}" "${{ env.CONFIG_REPO }}" "${{ env.CONFIG_OWNER }}"
-          fi
+          chmod +x "./diy.sh"
+          "./diy.sh" "${CONFIG_REPO}" "${CONFIG_OWNER}"
 
           make defconfig
 
-      - name: Check and Push config
-        run: |
-          git pull
-          [ -e "${{ matrix.config }}" ] && cp ~/openwrt/.config "${{ matrix.config }}"
-          status=$(git status -s | grep "${{ matrix.config }}" | awk '{printf $2}')
-          if [ -n "${status}" ]; then
-            git add "${status}"
-            git commit -m "update $(date +%Y-%m-%d" "%H:%M:%S)"
-            git push -f
+          if [ "$GITHUB_ACTIONS" == "true" ]; then
+            pushd ${WORKSPACE}
+            git pull
+            cp -f ${WORKSPACE}/${CONFIG_REPO}/.config "${WORKSPACE}/${config}"
+            status=$(git status -s | grep "${config}" | awk '{printf $2}')
+            if [ -n "${status}" ]; then
+              git add "${status}"
+              git commit -m "update $(date +%Y-%m-%d" "%H:%M:%S)"
+              git push -f
+            fi
+            popd
           fi
-
-      - name: Compile the firmware
-        run: |
-          cd ~/openwrt
 
           echo -e "download package"
           make download -j8 V=s
 
-          find dl -size -1024c -exec ls -l {} \;
-          find dl -size -1024c -exec rm -f {} \;
+          # find dl -size -1024c -exec ls -l {} \;
+          # find dl -size -1024c -exec rm -f {} \;
 
           echo -e "$(nproc) thread compile"
-          make -j$(nproc) V=s || make -j1 V=s
+          make -j$(nproc) V=s >/dev/null 2>&1 || make -j1 V=s
 
-          grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > device_name
-          [ -s device_name ] && echo "device_name=_$(cat device_name)" >> $GITHUB_ENV
-
-      - name: Organize files
-        if: success() && !cancelled()
-        run: |
-          df -hT
-          cd ~/openwrt/bin/targets/*/*
+          DEVICE_NAME=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/')
+     
+          pushd bin/targets/*/*
           ls -al
 
           # sed -i '/buildinfo/d; /\.bin/d; /\.manifest/d' sha256sums
           rm -rf packages *.buildinfo *.manifest *.bin sha256sums
 
-          filename=${{ env.CONFIG_REPO }}-${{ env.CONFIG_NAME }}-${{ env.release }}.zip
+          filename=${CONFIG_REPO}-${CONFIG_NAME}-${release}.zip
 
           gzip *.img 2>/dev/null || true
           zip -q -r ${filename} *
-          echo "firmware=$PWD/${filename}" >> $GITHUB_ENV
+
+          if [ "$GITHUB_ACTIONS" == "true" ]; then
+            echo "firmware=$(pwd)/${filename}" >> $GITHUB_ENV
+          else
+            mv -f ${filename} ${WORKSPACE}
+          fi
+          popd  # bin/targets/*/*
+          popd  # ${CONFIG_REPO}
+
+          df -h
 
       - name: Upload firmware to release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: success() && !cancelled()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,14 +1,14 @@
 # OpenWrt_Build
 自动编译X86_OpenWrt,每月自动编译一次。如有需要可在Release处自行下载！
 ## 介绍  
-[OpenWrt_Build](https://github.com/arthur97172/OpenWrt_Build)
+[OpenWrt_Build](https://github.com/Arthur97172/Openwrt_Lede_Build)
 
 <!-- version -->
 <a href="https://github.com/arthur97172/OpenWrt_Build/releases">
-<img src="https://img.shields.io/github/release-pre/arthur97172/OpenWrt_Build.svg?style=flat" alt="latest version"/>
+<img src="https://img.shields.io/github/release-pre/arthur97172/OpenWrt_Lede_Build.svg?style=flat" alt="latest version"/>
 </a>
 <!-- license -->
-<a href="https://github.com/arthur97172/OpenWrt_Build">
+<a href="https://github.com/arthur97172/OpenWrt_Lede_Build">
 <img src="https://img.shields.io/github/license/mashape/apistatus.svg?style=flat" alt="license"/>
 </a>
 
@@ -85,7 +85,7 @@
 　└── <b>退出</b>
 </details>
 
-![avatar](https://github.com/Arthur97172/OpenWrt_Build/blob/myapp/001.jpg)
+![avatar](https://github.com/Arthur97172/OpenWrt_Lede_Build/blob/myapp/001.jpg)
 
 ## 特别提示
 

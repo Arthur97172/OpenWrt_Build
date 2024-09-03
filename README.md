@@ -1,7 +1,7 @@
 # OpenWrt_Build
-自动编译X86_OpenWrt,每月自动编译一次。如有需要可在Release处自行下载！
+自动编译X86_OpenWrt_Lede,每月自动编译一次。如有需要可在Release处自行下载！
 ## 介绍  
-[OpenWrt_Build](https://github.com/Arthur97172/Openwrt_Lede_Build)
+[OpenWrt_Lede_Build](https://github.com/Arthur97172/Openwrt_Lede_Build)
 
 <!-- version -->
 <a href="https://github.com/arthur97172/OpenWrt_Build/releases">

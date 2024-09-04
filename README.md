@@ -4,7 +4,7 @@
 [OpenWrt_Lede_Build](https://github.com/Arthur97172/Openwrt_Lede_Build)
 
 <!-- version -->
-<a href="https://github.com/arthur97172/OpenWrt_Build/releases">
+<a href="https://github.com/arthur97172/OpenWrt_Lede_Build/releases">
 <img src="https://img.shields.io/github/release-pre/arthur97172/OpenWrt_Lede_Build.svg?style=flat" alt="latest version"/>
 </a>
 <!-- license -->

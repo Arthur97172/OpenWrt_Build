@@ -12,8 +12,6 @@
 <img src="https://img.shields.io/github/license/mashape/apistatus.svg?style=flat" alt="license"/>
 </a>
 
-## Note
-
 >源码仓库：[Lean's LEDE](https://github.com/coolsnowwolf/lede)  
 
 >默认后台：default IP is 192.168.5.1 and no default password.
